@@ -66,6 +66,8 @@ static NSString * const kUsersSegue = @"PresentUsersViewController";
 @property (strong, nonatomic) UIBarButtonItem *statsItem;
 @property (strong, nonatomic) UIBarButtonItem *addUsersItem;
 
+@property (assign, nonatomic) BOOL shouldRestartConference;
+
 @end
 
 @implementation CallViewController
@@ -88,6 +90,22 @@ static NSString * const kUsersSegue = @"PresentUsersViewController";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self createSession];
+    
+    [self configureGUI];
+    
+    self.view.backgroundColor = self.opponentsCollectionView.backgroundColor =
+    [UIColor colorWithRed:0.1465 green:0.1465 blue:0.1465 alpha:1.0];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    [SVProgressHUD showWithStatus:@"MEMORY WARNING: leaving out of call"];
+    self.state = CallViewControllerStateDisconnecting;
+    [self.session leave];
+}
+
+- (void)createSession {
     // creating session
     self.session = [[QBRTCConferenceClient instance] createSessionWithChatDialogID:_chatDialog.ID conferenceType:_conferenceType > 0 ? _conferenceType : QBRTCConferenceTypeVideo];
     
@@ -107,18 +125,6 @@ static NSString * const kUsersSegue = @"PresentUsersViewController";
         [self.cameraCapture startSession:nil];
 #endif
     }
-    
-    [self configureGUI];
-    
-    self.view.backgroundColor = self.opponentsCollectionView.backgroundColor =
-    [UIColor colorWithRed:0.1465 green:0.1465 blue:0.1465 alpha:1.0];
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    [SVProgressHUD showWithStatus:@"MEMORY WARNING: leaving out of call"];
-    self.state = CallViewControllerStateDisconnecting;
-    [self.session leave];
 }
 
 - (void)configureGUI {
@@ -401,7 +407,9 @@ static NSString * const kUsersSegue = @"PresentUsersViewController";
             [[QBRTCAudioSession instance] deinitialize];
         }
         
-        [self closeCallWithTimeout:NO];
+        if (!self.shouldRestartConference) {
+            [self closeCallWithTimeout:NO];
+        }
     }
 }
 
@@ -409,8 +417,11 @@ static NSString * const kUsersSegue = @"PresentUsersViewController";
     
     if (session == self.session
         && self.state != CallViewControllerStateDisconnected) {
-        
-        [self closeCallWithTimeout:timeout];
+        if (self.shouldRestartConference) {
+            [self createSession];
+        } else {
+            [self closeCallWithTimeout:timeout];
+        }
     }
 }
 
@@ -486,6 +497,10 @@ static NSString * const kUsersSegue = @"PresentUsersViewController";
 }
 
 // MARK: Actions
+- (IBAction)restartPressed:(UIBarButtonItem *)sender {
+    self.shouldRestartConference = YES;
+    [self.session leave];
+}
 
 - (void)pushAddUsersToRoomScreen {
     [self performSegueWithIdentifier:kUsersSegue sender:nil];

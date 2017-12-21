@@ -25,14 +25,17 @@ const NSTimeInterval kQBDialingTimeInterval = 5.0f;
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
     
     self.window.backgroundColor = [UIColor whiteColor];
     
-    [QBSettings setAccountKey:@""];
-    [QBSettings setApplicationID:0];
-    [QBSettings setAuthKey:@""];
-    [QBSettings setAuthSecret:@""];
+    [QBSettings setApiEndpoint:@"https://apireactoo.quickblox.com"
+                  chatEndpoint:@"chatreactoo.quickblox.com"
+                forServiceZone:QBConnectionZoneTypeDevelopment];
+    [QBSettings setServiceZone:QBConnectionZoneTypeDevelopment];
+    [QBSettings setAccountKey:@"vvyqrAfk-jTv9zaXK-sX"];
+    [QBSettings setApplicationID:4];
+    [QBSettings setAuthKey:@"EPO9hd7LQGXZQAJ"];
+    [QBSettings setAuthSecret:@"5NGT2c5Q9k68avn"];
     
     [QBSettings setLogLevel:QBLogLevelNothing];
     [QBSettings disableXMPPLogging];
@@ -41,7 +44,7 @@ const NSTimeInterval kQBDialingTimeInterval = 5.0f;
     [QBRTCConfig setDialingTimeInterval:kQBDialingTimeInterval];
     [QBRTCConfig setLogLevel:QBRTCLogLevelVerbose];
     
-    [QBRTCConfig setConferenceEndpoint:@"wss://janusdev.quickblox.com:8989"];
+    [QBRTCConfig setConferenceEndpoint:@"wss://groupcallsreactoo.quickblox.com:8989"];
     
 #if ENABLE_STATS_REPORTS
     [QBRTCConfig setStatsReportTimeInterval:1.0f];
