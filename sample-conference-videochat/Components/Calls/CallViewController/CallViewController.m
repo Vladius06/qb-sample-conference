@@ -418,7 +418,13 @@ static NSString * const kUsersSegue = @"PresentUsersViewController";
     if (session == self.session
         && self.state != CallViewControllerStateDisconnected) {
         if (self.shouldRestartConference) {
-            [self createSession];
+            // uncomment folowing to see that new session being successfully created
+            // if give some delay
+//            dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC);
+//            dispatch_after(delay, dispatch_get_main_queue(), ^{
+                [self createSession];
+                [self refreshVideoViews];
+//            });
         } else {
             [self closeCallWithTimeout:timeout];
         }
